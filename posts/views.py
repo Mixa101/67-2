@@ -1,7 +1,8 @@
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from posts.forms import PostForm
 from posts.models import Post
 
 # Create your views here.
@@ -12,12 +13,24 @@ def hello_world(request: HttpRequest):
 
 
 def post_list(request: HttpRequest):
-    posts = Post.objects.all()
+    posts = Post.objects.order_by("-created_at").all()
 
     return render(request, "posts/posts.html", {"posts": posts})
 
 
 def post_detail(request: HttpRequest, id: int) -> HttpResponse:
-    post = Post.objects.get(id=id)
-
+    post = get_object_or_404(Post, id=id)
     return render(request, "posts/post_detail.html", {"post": post})
+
+
+def create_post(request: HttpRequest) -> HttpResponse:
+    form = PostForm()
+    if request.method.lower() == "post":  # type: ignore
+        form = PostForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            form.instance.save()
+
+            return redirect("post_list")
+
+    return render(request, "posts/create_post.html", context={"form": form})

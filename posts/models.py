@@ -1,6 +1,14 @@
 from django.db import models
 
 
+class Category(models.Model):
+    name = models.CharField()
+
+
+class Tag(models.Model):
+    name = models.CharField()
+
+
 class Post(models.Model):
     title = models.CharField(max_length=500)
     description = models.TextField()
@@ -8,6 +16,8 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     image = models.ImageField(null=True, upload_to="posts/")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    tags = models.ManyToManyField(Tag)
 
 
 # # Create your models here.
