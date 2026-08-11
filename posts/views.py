@@ -1,7 +1,10 @@
+from typing import Any
+
+from django.forms.models import BaseModelForm
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import UpdateView
+from django.views.generic import CreateView, UpdateView
 
 from posts.forms import PostForm
 from posts.models import Post
@@ -24,19 +27,36 @@ def post_detail(request: HttpRequest, id: int) -> HttpResponse:
     return render(request, "posts/post_detail.html", {"post": post})
 
 
-def create_post(request: HttpRequest) -> HttpResponse:
-    if request.user.is_anonymous:
-        return redirect("login")
-    form = PostForm()
-    if request.method.lower() == "post":  # type: ignore
-        form = PostForm(request.POST, request.FILES)
+# def create_post(request: HttpRequest) -> HttpResponse:
+#     if request.user.is_anonymous:
+#         return redirect("login")
+#     form = PostForm()
+#     if request.method.lower() == "post":  # type: ignore
+#         form = PostForm(request.POST, request.FILES)
 
-        if form.is_valid():
-            form.instance.user = request.user
-            form.instance.save()
-            return redirect("post_list")
+#         if form.is_valid():
+#             form.instance.user = request.user
+#             form.instance.save()
+#             return redirect("post_list")
 
-    return render(request, "posts/create_post.html", context={"form": form})
+#     return render(request, "posts/create_post.html", context={"form": form})
+
+
+class CreatePostView(CreateView):
+    model = Post
+    template_name = "posts/create_post.html"
+    form_class = PostForm
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+
+        if request.user.is_anonymous:
+            return redirect("login")
+
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class UpdatePostView(UpdateView):

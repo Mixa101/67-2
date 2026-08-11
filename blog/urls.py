@@ -20,7 +20,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from posts.views import UpdatePostView, create_post, hello_world, post_detail, post_list
+from posts.views import (
+    CreatePostView,
+    UpdatePostView,
+    hello_world,
+    post_detail,
+    post_list,
+)
 from users.views import login_view, logout_view, register
 
 urlpatterns = [
@@ -28,7 +34,7 @@ urlpatterns = [
     path("", hello_world),
     path("posts/", post_list, name="post_list"),
     path("posts/<int:id>/", post_detail, name="post_detail"),
-    path("posts/create/", create_post, name="post_create"),
+    path("posts/create/", CreatePostView.as_view(), name="post_create"),
     path("user/register/", register, name="register"),
     path("user/login/", login_view, name="login"),
     path("user/logout/", logout_view, name="logout"),
