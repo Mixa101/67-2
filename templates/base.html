@@ -40,10 +40,23 @@
           <a class="nav-link disabled" aria-disabled="true">Disabled</a>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+      
+      <div class="d-flex align-items-center gap-2">
+        <form class="d-flex me-2" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+
+        {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post" class="d-inline m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Выйти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">Войти</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Регистрация</a>
+        {% endif %}
+      </div>
     </div>
   </div>
 </nav>

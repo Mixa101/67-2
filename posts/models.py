@@ -1,4 +1,6 @@
+from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 
 class Category(models.Model):
@@ -18,6 +20,10 @@ class Post(models.Model):
     image = models.ImageField(null=True, upload_to="posts/")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     tags = models.ManyToManyField(Tag)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse("post_detail", kwargs={"id": self.pk})
 
 
 # # Create your models here.

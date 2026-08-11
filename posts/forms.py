@@ -7,11 +7,16 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ("title", "description", "image")
-
-    def clean_title(self) -> dict:
-        title = self.cleaned_data["title"]
-
-        if title == "banned word":
-            raise forms.ValidationError("this word is banned")
-
-        return self.cleaned_data
+        widgets = {  # noqa: RUF012
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Введите заголовок"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Введите описание",
+                }
+            ),
+            "image": forms.FileInput(attrs={"class": "form-control"}),
+        }
