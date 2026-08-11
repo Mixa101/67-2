@@ -22,6 +22,8 @@ from django.urls import path
 
 from posts.views import (
     CreatePostView,
+    LikePostView,
+    MyPostsListView,
     UpdatePostView,
     hello_world,
     post_detail,
@@ -33,12 +35,14 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", hello_world),
     path("posts/", post_list, name="post_list"),
+    path("posts/my", MyPostsListView.as_view(), name="my_posts"),
     path("posts/<int:id>/", post_detail, name="post_detail"),
     path("posts/create/", CreatePostView.as_view(), name="post_create"),
     path("user/register/", register, name="register"),
     path("user/login/", login_view, name="login"),
     path("user/logout/", logout_view, name="logout"),
     path("posts/<int:pk>/update", UpdatePostView.as_view(), name="edit_post"),
+    path("posts/<int:pk>/like", LikePostView.as_view(), name="like_post"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

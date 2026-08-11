@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Личный кабинет | {{ user.username }}</title>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Шапка профиля -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden">
+        <div class="card-body p-4 p-md-5 bg-white">
+            <div class="d-flex flex-column flex-md-row align-items-center gap-4">
+                <!-- Аватар пользователя -->
+                <div class="position-relative">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" 
+                             class="rounded-circle object-fit-cover shadow-sm" style="width: 110px; height: 110px;">
+                    {% else %}
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                             style="width: 110px; height: 110px; font-size: 2.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Информация о пользователе -->
+                <div class="text-center text-md-start flex-grow-1">
+                    <h2 class="fw-bold text-dark mb-1">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="text-muted mb-2">@{{ user.username }} • {{ user.email }}</p>
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                        <i class="bi bi-journal-text me-1"></i> Постов опубликовано: {{ posts|length }}
+                    </span>
+                </div>
+
+                <!-- Действия с профилем -->
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <a href="{% url 'post_create' %}" class="btn btn-primary rounded-pill px-4">
+                        + Новый пост
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Заголовок секции постов -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="fw-bold text-dark mb-0">Мои публикации</h3>
+    </div>
+
+    {% load static %}
+    <!-- Сетка постов пользователя -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for post in posts %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow">
+                {% if post.image %}
+                <div class="position-relative" style="height: 200px;">
+                    <img src="{{ post.image.url }}" 
+                         class="card-img-top w-100 h-100" 
+                         style="object-fit: cover;" 
+                         alt="{{ post.title }}">
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-50 rounded-pill">
+                        <i class="bi bi-calendar3 me-1"></i>{{ post.created_at|date:"d.m.Y" }}
+                    </span>
+                </div>
+                {% else %}
+                <div class="position-relative d-flex align-items-center justify-content-center" 
+                     style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <img src="{% static 'default.png' %}" 
+                         class="card-img-top w-100 h-100" 
+                         style="object-fit: cover;" 
+                         alt="{{ post.title }}">
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-50 rounded-pill">
+                        <i class="bi bi-calendar3 me-1"></i>{{ post.created_at|date:"d.m.Y" }}
+                    </span>
+                </div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold text-dark mb-2">{{ post.title }}</h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        {{ post.description|truncatewords:15|default:"Нет описания" }}
+                    </p>
+
+                    <!-- Панель управления постом -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <a href="{% url 'post_detail' post.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            Просмотр
+                        </a>
+                        <div class="btn-group">
+                            <a href="{% url 'edit_post' post.id %}" class="btn btn-sm btn-light rounded-circle me-1" title="Редактировать">
+                                ✏️
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Если у пользователя еще нет постов -->
+        <div class="col-12 text-center py-5">
+            <div class="text-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" 
+                     class="bi bi-journal-plus opacity-25 mb-3" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3z"/>
+                </svg>
+                <h4>Вы еще ничего не опубликовали</h4>
+                <p>Поделитесь своими мыслями, создав свой первый пост!</p>
+                <a href="{% url 'post_create' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+                    Создать пост
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-shadow { 
+        transition: transform 0.25s ease, box-shadow 0.25s ease; 
+    }
+    .hover-shadow:hover { 
+        transform: translateY(-6px); 
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.15) !important; 
+    }
+</style>
+{% endblock %}

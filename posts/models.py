@@ -26,6 +26,15 @@ class Post(models.Model):
         return reverse("post_detail", kwargs={"id": self.pk})
 
 
+class PostLikes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    created_at = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        return reverse("post_detail", kwargs={"id": self.post.pk})
+
+
 # # Create your models here.
 # # C-R-U-D
 
